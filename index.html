@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧩 Puzzle Game | ULUG'BEK.R</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top, #243b72 0%, #11182f 45%, #070b18 100%);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    overflow-x: hidden;
+}
+
+.container {
+    width: min(1200px, 100%);
+    min-height: 95vh;
+    background: rgba(10, 15, 35, 0.88);
+    border: 2px solid rgba(100, 200, 255, 0.35);
+    border-radius: 25px;
+    box-shadow: 0 0 40px rgba(0, 180, 255, 0.2);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* HEADER */
+
+header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+header h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px #00d9ff;
+}
+
+header p {
+    margin-top: 5px;
+    color: #9edfff;
+}
+
+/* PLAYER */
+
+.player-box {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0;
+}
+
+.player-box input {
+    width: min(400px, 90%);
+    padding: 13px 18px;
+    border-radius: 30px;
+    border: 2px solid #00cfff;
+    background: #111a38;
+    color: white;
+    outline: none;
+    text-align: center;
+    font-size: 17px;
+}
+
+/* MENU */
+
+.menu {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.menu button,
+.controls button {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin: 5px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 5px 15px rgba(0, 150, 255, 0.25);
+}
+
+button:hover {
+    transform: translateY(-2px) scale(1.03);
+    filter: brightness(1.15);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+/* STATS */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin: 15px auto;
+}
+
+.stat {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+}
+
+.stat span {
+    display: block;
+    font-size: 12px;
+    color: #9fb4d9;
+}
+
+.stat strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 18px;
+}
+
+/* PUZZLE */
+
+.game-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.puzzle {
+    width: min(100%, 1000px);
+    aspect-ratio: 9 / 7;
+
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+
+    gap: 4px;
+    padding: 5px;
+
+    background: #050a19;
+    border-radius: 15px;
+    border: 2px solid #00cfff;
+
+    box-shadow:
+        0 0 20px rgba(0, 200, 255, 0.25),
+        inset 0 0 20px rgba(0, 200, 255, 0.1);
+}
+
+.tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: linear-gradient(135deg, #16bffd, #005bea);
+    border-radius: 5px;
+
+    font-weight: bold;
+    font-size: clamp(10px, 1.7vw, 22px);
+
+    cursor: pointer;
+    user-select: none;
+
+    box-shadow:
+        inset 0 1px rgba(255,255,255,0.3),
+        0 2px 5px rgba(0,0,0,0.4);
+
+    transition:
+        transform 0.15s,
+        filter 0.15s,
+        background 0.15s;
+}
+
+.tile:hover {
+    filter: brightness(1.3);
+    transform: scale(0.96);
+}
+
+.tile.correct {
+    background: linear-gradient(135deg, #00e676, #00a152);
+}
+
+.tile.wrong {
+    animation: shake 0.3s;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+}
+
+.empty {
+    background: rgba(255,255,255,0.03);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    cursor: default;
+}
+
+/* CONTROLS */
+
+.controls {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.controls button {
+    background: linear-gradient(135deg, #8e2de2, #4a00e0);
+}
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #7bdfff;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* OVERLAY */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.78);
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+    padding: 20px;
+}
+
+.overlay.show {
+    display: flex;
+}
+
+.modal {
+    width: min(500px, 95%);
+    background:
+        linear-gradient(145deg, #111b42, #080d20);
+
+    border: 2px solid #00d9ff;
+    border-radius: 25px;
+    padding: 30px;
+    text-align: center;
+
+    box-shadow: 0 0 50px rgba(0,200,255,0.4);
+
+    animation: pop 0.35s ease;
+}
+
+.modal h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+    color: #00e5ff;
+}
+
+.modal p {
+    margin: 8px;
+    color: #d8efff;
+}
+
+.modal button {
+    margin-top: 15px;
+}
+
+/* PAUSE */
+
+.pause-text {
+    font-size: 50px;
+}
+
+/* LEVEL EFFECT */
+
+.level-up {
+    animation: levelFlash 0.8s ease;
+}
+
+/* PARTICLES */
+
+.particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: #00eaff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2000;
+}
+
+/* ANIMATIONS */
+
+@keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+@keyframes pop {
+    from {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes levelFlash {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); filter: brightness(1.8); }
+    100% { transform: scale(1); }
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 5px;
+    }
+
+    .container {
+        padding: 10px;
+        min-height: 100vh;
+        border-radius: 15px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stat {
+        padding: 7px;
+    }
+
+    .stat strong {
+        font-size: 15px;
+    }
+
+    .puzzle {
+        gap: 2px;
+        padding: 3px;
+    }
+
+    .tile {
+        border-radius: 3px;
+    }
+
+    .menu button,
+    .controls button {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    footer {
+        font-size: 13px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>🧩 PUZZLE GAME</h1>
+        <p>7 × 9 Ultimate Puzzle</p>
+    </header>
+
+    <!-- PLAYER NAME -->
+
+    <div class="player-box">
+        <input
+            id="playerName"
+            type="text"
+            maxlength="20"
+            placeholder="👤 O'yinchi ismini yozing..."
+        >
+    </div>
+
+    <!-- MENU -->
+
+    <div class="menu">
+
+        <button onclick="startGame()">
+            🎮 BOSHLASH
+        </button>
+
+        <button onclick="toggleMusic()">
+            🎵 <span id="musicText">MUSIQA ON</span>
+        </button>
+
+        <button onclick="toggleSound()">
+            🔊 <span id="soundText">OVOZ ON</span>
+        </button>
+
+    </div>
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+        <div class="stat">
+            <span>LEVEL</span>
+            <strong id="level">1</strong>
+        </div>
+
+        <div class="stat">
+            <span>⏱ TIME</span>
+            <strong id="timer">00:00</strong>
+        </div>
+
+        <div class="stat">
+            <span>🏆 SCORE</span>
+            <strong id="score">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>🔢 HARAKAT</span>
+            <strong id="moves">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>❤️ JON</span>
+            <strong id="lives">❤️❤️❤️</strong>
+        </div>
+
+        <div class="stat">
+            <span>🏅 REKORD</span>
+            <strong id="bestScore">0</strong>
+        </div>
+
+    </div>
+
+    <!-- PUZZLE -->
+
+    <div class="game-area">
+        <div id="puzzle" class="puzzle"></div>
+    </div>
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <button onclick="pauseGame()">
+            ⏸️ PAUSE
+        </button>
+
+        <button onclick="restartGame()">
+            🔄 QAYTA
+        </button>
+
+    </div>
+
+    <footer>
+        ULUG'BEK.R
+    </footer>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div id="overlay" class="overlay">
+
+    <div class="modal">
+
+        <h2 id="modalTitle">🎉 TABRIKLAYMIZ!</h2>
+
+        <div id="modalContent"></div>
+
+        <button onclick="closeModal(); startGame();">
+            🎮 YANA O'YNASH
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   PUZZLE GAME
+   ULUG'BEK.R
+   7 x 9
+===================================================== */
+
+const ROWS = 7;
+const COLS = 9;
+const TOTAL = ROWS * COLS;
+
+let board = [];
+let emptyIndex = TOTAL - 1;
+
+let level = 1;
+let score = 0;
+let moves = 0;
+let lives = 3;
+
+let seconds = 0;
+let timerInterval = null;
+
+let gameStarted = false;
+let paused = false;
+
+let soundOn = true;
+let musicOn = true;
+
+let bestScore =
+    Number(localStorage.getItem("ULUGBEK_PUZZLE_BEST")) || 0;
+
+document.getElementById("bestScore").textContent = bestScore;
+
+
+/* =====================================================
+   AUDIO
+===================================================== */
+
+let audioContext = null;
+
+function getAudio() {
+
+    if (!audioContext) {
+        audioContext =
+            new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    return audioContext;
+}
+
+function playSound(type) {
+
+    if (!soundOn) return;
+
+    try {
+
+        const ctx = getAudio();
+
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+
+        let frequency = 400;
+
+        if (type === "move") frequency = 450;
+        if (type === "good") frequency = 700;
+        if (type === "bad") frequency = 180;
+        if (type === "win") frequency = 900;
+        if (type === "click") frequency = 300;
+
+        oscillator.frequency.value = frequency;
+
+        oscillator.type = "sine";
+
+        gain.gain.setValueAtTime(
+            0.001,
+            ctx.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.15,
+            ctx.currentTime + 0.01
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            ctx.currentTime + 0.18
+        );
+
+        oscillator.start();
+
+        oscillator.stop(
+            ctx.currentTime + 0.2
+        );
+
+    } catch(e) {}
+
+}
+
+
+/* =====================================================
+   MUSIC
+===================================================== */
+
+let musicTimer = null;
+let musicStep = 0;
+
+const musicNotes = [
+    261.63,
+    329.63,
+    392.00,
+    329.63,
+    293.66,
+    349.23,
+    440.00,
+    349.23
+];
+
+function startMusic() {
+
+    if (!musicOn) return;
+
+    if (musicTimer) return;
+
+    musicTimer = setInterval(() => {
+
+        if (!musicOn || paused || !gameStarted) return;
+
+        try {
+
+            const ctx = getAudio();
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.frequency.value =
+                musicNotes[musicStep % musicNotes.length];
+
+            osc.type = "sine";
+
+            gain.gain.value = 0.025;
+
+            osc.start();
+
+            osc.stop(ctx.currentTime + 0.18);
+
+            musicStep++;
+
+        } catch(e) {}
+
+    }, 350);
+}
+
+function stopMusic() {
+
+    clearInterval(musicTimer);
+
+    musicTimer = null;
+}
+
+function toggleMusic() {
+
+    musicOn = !musicOn;
+
+    document.getElementById("musicText").textContent =
+        musicOn ? "MUSIQA ON" : "MUSIQA OFF";
+
+    if (musicOn) {
+
+        startMusic();
+
+    } else {
+
+        stopMusic();
+
+    }
+}
+
+function toggleSound() {
+
+    soundOn = !soundOn;
+
+    document.getElementById("soundText").textContent =
+        soundOn ? "OVOZ ON" : "OVOZ OFF";
+
+    if (soundOn) {
+        playSound("click");
+    }
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function startTimer() {
+
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+
+        if (!gameStarted || paused) return;
+
+        seconds++;
+
+        updateTimer();
+
+    }, 1000);
+}
+
+function updateTimer() {
+
+    const min =
+        String(Math.floor(seconds / 60)).padStart(2, "0");
+
+    const sec =
+        String(seconds % 60).padStart(2, "0");
+
+    document.getElementById("timer").textContent =
+        `${min}:${sec}`;
+}
+
+
+/* =====================================================
+   BOARD
+===================================================== */
+
+function createSolvedBoard() {
+
+    board = [];
+
+    for (let i = 1; i < TOTAL; i++) {
+        board.push(i);
+    }
+
+    board.push(0);
+
+    emptyIndex = TOTAL - 1;
+}
+
+
+/* =====================================================
+   SHUFFLE
+===================================================== */
+
+function shuffleBoard() {
+
+    createSolvedBoard();
+
+    let shuffleMoves =
+        100 + level * 30;
+
+    let previous = -1;
+
+    for (let i = 0; i < shuffleMoves; i++) {
+
+        const possible =
+            getPossibleMoves(emptyIndex)
+            .filter(index => index !== previous);
+
+        if (possible.length === 0) continue;
+
+        const selected =
+            possible[
+                Math.floor(Math.random() * possible.length)
+            ];
+
+        previous = emptyIndex;
+
+        swapTiles(selected, emptyIndex);
+
+        emptyIndex = selected;
+    }
+
+    if (isSolved()) {
+        shuffleBoard();
+    }
+}
+
+
+/* =====================================================
+   POSSIBLE MOVES
+===================================================== */
+
+function getPossibleMoves(index) {
+
+    const row = Math.floor(index / COLS);
+    const col = index % COLS;
+
+    const result = [];
+
+    if (row > 0)
+        result.push(index - COLS);
+
+    if (row < ROWS - 1)
+        result.push(index + COLS);
+
+    if (col > 0)
+        result.push(index - 1);
+
+    if (col < COLS - 1)
+        result.push(index + 1);
+
+    return result;
+}
+
+
+/* =====================================================
+   SWAP
+===================================================== */
+
+function swapTiles(a, b) {
+
+    const temp = board[a];
+
+    board[a] = board[b];
+
+    board[b] = temp;
+}
+
+
+/* =====================================================
+   DRAW BOARD
+===================================================== */
+
+function renderBoard() {
+
+    const puzzle =
+        document.getElementById("puzzle");
+
+    puzzle.innerHTML = "";
+
+    board.forEach((value, index) => {
+
+        const tile =
+            document.createElement("div");
+
+        tile.className = "tile";
+
+        if (value === 0) {
+
+            tile.classList.add("empty");
+
+        } else {
+
+            tile.textContent = value;
+
+            tile.addEventListener(
+                "click",
+                () => moveTile(index)
+            );
+
+        }
+
+        puzzle.appendChild(tile);
+
+    });
+}
+
+
+/* =====================================================
+   MOVE TILE
+===================================================== */
+
+function moveTile(index) {
+
+    if (!gameStarted || paused) return;
+
+    const possible =
+        getPossibleMoves(emptyIndex);
+
+    if (!possible.includes(index)) {
+
+        loseLife();
+
+        return;
+    }
+
+    swapTiles(index, emptyIndex);
+
+    emptyIndex = index;
+
+    moves++;
+
+    score += 5;
+
+    document.getElementById("moves").textContent =
+        moves;
+
+    document.getElementById("score").textContent =
+        score;
+
+    playSound("move");
+
+    renderBoard();
+
+    if (isSolved()) {
+
+        winLevel();
+
+    }
+
+}
+
+
+/* =====================================================
+   LOSE LIFE
+===================================================== */
+
+function loseLife() {
+
+    lives--;
+
+    updateLives();
+
+    playSound("bad");
+
+    const puzzle =
+        document.getElementById("puzzle");
+
+    puzzle.classList.add("level-up");
+
+    setTimeout(() => {
+        puzzle.classList.remove("level-up");
+    }, 400);
+
+    if (lives <= 0) {
+
+        gameOver();
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE LIVES
+===================================================== */
+
+function updateLives() {
+
+    let text = "";
+
+    for (let i = 0; i < lives; i++) {
+        text += "❤️";
+    }
+
+    for (let i = lives; i < 3; i++) {
+        text += "🖤";
+    }
+
+    document.getElementById("lives").textContent =
+        text;
+}
+
+
+/* =====================================================
+   CHECK SOLVED
+===================================================== */
+
+function isSolved() {
+
+    for (let i = 0; i < TOTAL - 1; i++) {
+
+        if (board[i] !== i + 1) {
+            return false;
+        }
+
+    }
+
+    return board[TOTAL - 1] === 0;
+}
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+function startGame() {
+
+    const nameInput =
+        document.getElementById("playerName");
+
+    if (nameInput.value.trim() === "") {
+
+        nameInput.focus();
+
+        nameInput.placeholder =
+            "⚠️ Avval ismingizni yozing!";
+
+        return;
+    }
+
+    closeModal();
+
+    level = 1;
+    score = 0;
+    moves = 0;
+    lives = 3;
+    seconds = 0;
+
+    gameStarted = true;
+    paused = false;
+
+    updateInterface();
+
+    shuffleBoard();
+
+    renderBoard();
+
+    startTimer();
+
+    startMusic();
+
+    playSound("click");
+}
+
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+    if (!gameStarted) {
+
+        startGame();
+
+        return;
+    }
+
+    level = 1;
+    score = 0;
+    moves = 0;
+    lives = 3;
+    seconds = 0;
+
+    paused = false;
+
+    updateInterface();
+
+    shuffleBoard();
+
+    renderBoard();
+
+    playSound("click");
+}
+
+
+/* =====================================================
+   PAUSE
+===================================================== */
+
+function pauseGame() {
+
+    if (!gameStarted) return;
+
+    paused = !paused;
+
+    if (paused) {
+
+        document.getElementById("modalTitle").textContent =
+            "⏸️ O'YIN PAUZA";
+
+        document.getElementById("modalContent").innerHTML =
+            `<p class="pause-text">⏸️</p>
+             <p>O'yin vaqtincha to'xtatildi.</p>`;
+
+        document.querySelector(".modal button").textContent =
+            "▶️ DAVOM ETISH";
+
+        document.querySelector(".modal button").onclick =
+            resumeGame;
+
+        document
+            .getElementById("overlay")
+            .classList.add("show");
+
+    } else {
+
+        resumeGame();
+
+    }
+
+}
+
+
+/* =====================================================
+   RESUME
+===================================================== */
+
+function resumeGame() {
+
+    paused = false;
+
+    closeModal();
+
+    playSound("click");
+
+}
+
+
+/* =====================================================
+   WIN LEVEL
+===================================================== */
+
+function winLevel() {
+
+    playSound("win");
+
+    createParticles();
+
+    const timeBonus =
+        Math.max(100, 1000 - seconds * 3);
+
+    score += timeBonus;
+
+    level++;
+
+    document.getElementById("score").textContent =
+        score;
+
+    document.getElementById("level").textContent =
+        level;
+
+    if (score > bestScore) {
+
+        bestScore = score;
+
+        localStorage.setItem(
+            "ULUGBEK_PUZZLE_BEST",
+            bestScore
+        );
+
+        document.getElementById("bestScore").textContent =
+            bestScore;
+    }
+
+    const oldLevel = level - 1;
+
+    document.getElementById("modalTitle").textContent =
+        `🎉 LEVEL ${oldLevel} TUGADI!`;
+
+    document.getElementById("modalContent").innerHTML =
+
+        `<p>🏆 <b>${getPlayerName()}</b></p>
+         <p>⭐ Score: <b>${score}</b></p>
+         <p>🔢 Harakatlar: <b>${moves}</b></p>
+         <p>⏱️ Vaqt: <b>${formatTime(seconds)}</b></p>
+         <p>🚀 Keyingi level: <b>${level}</b></p>`;
+
+    document.querySelector(".modal button").textContent =
+        "🚀 KEYINGI LEVEL";
+
+    document.querySelector(".modal button").onclick =
+        nextLevel;
+
+    document
+        .getElementById("overlay")
+        .classList.add("show");
+
+}
+
+
+/* =====================================================
+   NEXT LEVEL
+===================================================== */
+
+function nextLevel() {
+
+    closeModal();
+
+    lives = 3;
+
+    updateLives();
+
+    shuffleBoard();
+
+    renderBoard();
+
+    playSound("click");
+
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+function gameOver() {
+
+    gameStarted = false;
+
+    clearInterval(timerInterval);
+
+    stopMusic();
+
+    document.getElementById("modalTitle").textContent =
+        "💔 O'YIN TUGADI";
+
+    document.getElementById("modalContent").innerHTML =
+
+        `<p>👤 O'yinchi: <b>${getPlayerName()}</b></p>
+         <p>📈 Level: <b>${level}</b></p>
+         <p>🏆 Score: <b>${score}</b></p>
+         <p>🔢 Harakatlar: <b>${moves}</b></p>
+         <p>⏱️ Vaqt: <b>${formatTime(seconds)}</b></p>
+         <p>🏅 Rekord: <b>${bestScore}</b></p>`;
+
+    document.querySelector(".modal button").textContent =
+        "🔄 QAYTA BOSHLASH";
+
+    document.querySelector(".modal button").onclick =
+        () => {
+            closeModal();
+            startGame();
+        };
+
+    document
+        .getElementById("overlay")
+        .classList.add("show");
+
+}
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
+
+function getPlayerName() {
+
+    const name =
+        document
+            .getElementById("playerName")
+            .value
+            .trim();
+
+    return name || "O'yinchi";
+}
+
+
+/* =====================================================
+   FORMAT TIME
+===================================================== */
+
+function formatTime(totalSeconds) {
+
+    const min =
+        String(
+            Math.floor(totalSeconds / 60)
+        ).padStart(2, "0");
+
+    const sec =
+        String(
+            totalSeconds % 60
+        ).padStart(2, "0");
+
+    return `${min}:${sec}`;
+}
+
+
+/* =====================================================
+   UPDATE INTERFACE
+===================================================== */
+
+function updateInterface() {
+
+    document.getElementById("level").textContent =
+        level;
+
+    document.getElementById("score").textContent =
+        score;
+
+    document.getElementById("moves").textContent =
+        moves;
+
+    document.getElementById("timer").textContent =
+        formatTime(seconds);
+
+    updateLives();
+
+    document.getElementById("bestScore").textContent =
+        bestScore;
+}
+
+
+/* =====================================================
+   CLOSE MODAL
+===================================================== */
+
+function closeModal() {
+
+    document
+        .getElementById("overlay")
+        .classList.remove("show");
+
+}
+
+
+/* =====================================================
+   PARTICLES
+===================================================== */
+
+function createParticles() {
+
+    for (let i = 0; i < 35; i++) {
+
+        const particle =
+            document.createElement("div");
+
+        particle.className = "particle";
+
+        particle.style.left =
+            Math.random() * window.innerWidth + "px";
+
+        particle.style.top =
+            Math.random() * window.innerHeight + "px";
+
+        document.body.appendChild(particle);
+
+        const x =
+            (Math.random() - 0.5) * 400;
+
+        const y =
+            (Math.random() - 0.5) * 400;
+
+        particle.animate(
+            [
+                {
+                    transform: "translate(0,0)",
+                    opacity: 1
+                },
+                {
+                    transform:
+                        `translate(${x}px,${y}px)`,
+                    opacity: 0
+                }
+            ],
+            {
+                duration: 1000,
+                easing: "ease-out"
+            }
+        );
+
+        setTimeout(() => {
+            particle.remove();
+        }, 1000);
+    }
+}
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Escape") {
+
+            if (gameStarted) {
+                pauseGame();
+            }
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   SAVE PLAYER NAME
+===================================================== */
+
+document
+    .getElementById("playerName")
+    .addEventListener(
+        "input",
+        function() {
+
+            localStorage.setItem(
+                "ULUGBEK_PLAYER_NAME",
+                this.value
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   LOAD PLAYER NAME
+===================================================== */
+
+const savedName =
+    localStorage.getItem(
+        "ULUGBEK_PLAYER_NAME"
+    );
+
+if (savedName) {
+
+    document.getElementById("playerName").value =
+        savedName;
+
+}
+
+
+/* =====================================================
+   INITIAL BOARD
+===================================================== */
+
+createSolvedBoard();
+
+renderBoard();
+
+updateInterface();
+
+
+/* =====================================================
+   PREVENT ACCIDENTAL DRAG
+===================================================== */
+
+document.addEventListener(
+    "dragstart",
+    event => event.preventDefault()
+);
+
+</script>
+
+</body>
+</html>
